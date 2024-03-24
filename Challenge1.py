@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import tkinter as tk
 
 class Projectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight) -> None:
@@ -9,6 +10,7 @@ class Projectile():
         self.h = launchHeight
         self.ypos = []
         self.xpos = []
+        self.timePeriod = 0.1
 
     def resolve(self, u):
         uy = np.round(np.sin(self.launchAngle) * u, 2)
@@ -26,33 +28,31 @@ class Projectile():
     def xCoords(self, time):
         self.xpos.append(self.ux * time)
 
-TIMEPERIOD = 0.01
+    def simulate(self):
+        time = 0
+        time = self.suvat(time) 
 
-
-mod = Projectile(70, 9.81, 5, 4)
-print(mod.ux)
-print(mod.uy)
-
-
-time = 0
-
-time = mod.suvat(time) 
-
-while time != None:
-    mod.xCoords(time)
-    time += TIMEPERIOD
-    time = mod.suvat(time) 
+        while time != None:
+            self.xCoords(time)
+            time += self.timePeriod
+            time = self.suvat(time) 
       
-    print(time)
+mod = Projectile(50, 9.81, 20, 4)
+mod.simulate()
 
+def graph(x: list, y: list):
+    plt.plot(x, y)
+    plt.title("Distance of Projectile")
+    plt.xlabel("x /m")
+    plt.ylabel("y /m")
+    plt.show()
 
-print(mod.ypos)
-print(mod.xpos)
+graph(mod.xpos, mod.ypos)
 
-print(len(mod.xpos), "," , len(mod.ypos))
+'''
+mw = tk.Tk()
 
-plt.plot(mod.xpos, mod.ypos)
-plt.title("Distance of Projectile")
-plt.xlabel("x /m")
-plt.ylabel("y /m")
-plt.show()
+mw.title("Projectile: No Air Resistance")
+
+mw.mainloop()
+'''
