@@ -79,8 +79,8 @@ class Page1(tk.Frame):
     def __init__(self, parent, controller):
          
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text ="Page 1")
-        label.pack(side=tk.BOTTOM)
+        label = tk.Label(self, text ="Challenge 1")
+        label.pack(side=tk.TOP)
   
         # button to show frame 2 with text
         # layout2
@@ -157,25 +157,87 @@ class Page1(tk.Frame):
 class Page2(tk.Frame): 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text ="Page 2")
-        label.grid(row = 0, column = 4, padx = 10, pady = 10)
+        label = tk.Label(self, text ="Challenge 2")
+        label.pack(side=tk.TOP)
   
-        # button to show frame 2 with text
-        # layout2
-        #button1 = tk.Button(self, text ="Page 1", command=lambda : controller.show_frame(Page1))
-     
-        # putting the button in its place by 
-        # using grid
-        #button1.grid(row = 1, column = 1, padx = 10, pady = 10)
-  
-        # button to show frame 3 with text
-        # layout3
-        button2 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
-     
-        # putting the button in its place by
-        # using grid
-        button2.grid(row = 2, column = 1, padx = 10, pady = 10)
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
 
+        fig = Figure(figsize=(6, 6), dpi= 100)
+        ax = fig.add_subplot()
+
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        launchAngle_var = tk.IntVar()
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        launchHieght_var = tk.IntVar()
+
+        timePeriod_var = tk.StringVar()
+
+        def submit():
+
+            angle = launchAngle_var.get()
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            height = launchHieght_var.get()
+            tP = timePeriod_var.get()
+
+            dP = detailedProjectile(angle, grav, speed, height, float(tP))
+            ax.clear()
+
+            range_label.config(text="Range = "+ str(dP.xRange))
+            airTime_label.config(text="Air Time = "+ str(dP.t))
+            apogee_label.config(text="Apogee = ["+ str(dP.apogee[0]) + ", " +str(dP.apogee[1])+"]")
+
+            ax.plot(dP.xpos, dP.ypos, "r-o")
+            ax.plot(dP.apogee[0], dP.apogee[1], "x")
+            
+            canvas.draw()
+        
+        launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
+
+        tP_label, tP_entry = tk.Label(self, text = 'Time Period', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = timePeriod_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+
+        launchAngle_label.pack(side=tk.TOP)
+        launchAngle_entry.pack(side=tk.TOP)
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        launchHeight_label.pack(side=tk.TOP)
+        launchHeight_entry.pack(side=tk.TOP)
+
+        tP_label.pack(side=tk.TOP)
+        tP_entry.pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+
+        range_label = tk.Label(self, text=("Range ="), font=('calibre',20, 'bold'))
+        airTime_label = tk.Label(self, text=("Air Time ="), font=('calibre',20, 'bold'))
+        apogee_label = tk.Label(self, text=("Apogee ="), font=('calibre',20, 'bold'))
+        range_label.pack(side=tk.TOP)
+        airTime_label.pack(side=tk.TOP)
+        apogee_label.pack(side=tk.TOP)
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        
 
 class Projectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
@@ -211,6 +273,25 @@ class Projectile():
             self.xCoords(time)
             time += self.timePeriod
             time = self.suvat(time) 
+
+class detailedProjectile(Projectile):
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod):
+       
+        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, timePeriod)
+        self.simulate()
+        self.t, self.xRange = self.calcRange()
+        self.apogee = self.findApogee()
+        
+
+    def calcRange(self):
+        #quadratic formula rearanged
+        t = (self.uy + np.sqrt(self.uy**2 + 2*self.g*self.h))/self.g
+        xRange = self.ux * t
+        return np.round(t, 3), np.round(xRange, 3)
+    
+    def findApogee(self):
+        maximum = np.max(self.ypos)
+        return np.round([self.xpos[self.ypos.index(maximum)], maximum], 3)
 
 # Driver Code
 app = tkinterApp()
