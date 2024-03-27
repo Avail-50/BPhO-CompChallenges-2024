@@ -94,6 +94,7 @@ class Page1(tk.Frame):
 
         ax.set_xlabel("x /m")
         ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
 
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.draw()
@@ -120,6 +121,9 @@ class Page1(tk.Frame):
             mod.simulate()
             ax.clear()
             ax.plot(mod.xpos, mod.ypos)
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("equal")
             canvas.draw()
 
         launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
@@ -168,6 +172,7 @@ class Page2(tk.Frame):
 
         ax.set_xlabel("x /m")
         ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
 
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.draw()
@@ -181,7 +186,7 @@ class Page2(tk.Frame):
         launchSpeed_var = tk.IntVar()
         launchHieght_var = tk.IntVar()
 
-        timePeriod_var = tk.StringVar()
+        frequency_var = tk.IntVar()
 
         def submit():
 
@@ -189,17 +194,23 @@ class Page2(tk.Frame):
             grav = gravity_var.get()
             speed = launchSpeed_var.get()
             height = launchHieght_var.get()
-            tP = timePeriod_var.get()
+            freq = frequency_var.get()
 
-            dP = detailedProjectile(angle, grav, speed, height, float(tP))
+            dP = detailedProjectile(angle, grav, speed, height, freq)
+            dP.simulate()
             ax.clear()
 
-            range_label.config(text="Range = "+ str(dP.xRange))
-            airTime_label.config(text="Air Time = "+ str(dP.t))
-            apogee_label.config(text="Apogee = ["+ str(dP.apogee[0]) + ", " +str(dP.apogee[1])+"]")
+            range_label.config(text="Range = "+ str(np.round(dP.xRange, 3)))
+            airTime_label.config(text="Air Time = "+ str(np.round(dP.t, 3)))
+            apogee_label.config(text="Apogee = ["+ str(np.round(dP.apogee[0], 3)) + ", " +str(np.round(dP.apogee[1], 3))+"]")
 
-            ax.plot(dP.xpos, dP.ypos, "r-o")
-            ax.plot(dP.apogee[0], dP.apogee[1], "x")
+            ax.plot(dP.xpos, dP.ypos, "-o", label="y vs x")
+            ax.plot(dP.apogee[0], dP.apogee[1], "ro", label="apogee")
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("equal")
+            ax.legend(loc="upper right")
+            
             
             canvas.draw()
         
@@ -208,7 +219,7 @@ class Page2(tk.Frame):
         launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
         launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
 
-        tP_label, tP_entry = tk.Label(self, text = 'Time Period', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = timePeriod_var, font=('calibre',10,'normal'))
+        tP_label, tP_entry = tk.Label(self, text = 'Frequency', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
 
         sub_btn=tk.Button(self, text = 'Submit', command = submit)
 
@@ -275,23 +286,37 @@ class Projectile():
             time = self.suvat(time) 
 
 class detailedProjectile(Projectile):
-    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod):
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):
        
-        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, timePeriod)
-        self.simulate()
+        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, 0)
         self.t, self.xRange = self.calcRange()
         self.apogee = self.findApogee()
+        self.freq = freq
         
 
     def calcRange(self):
         #quadratic formula rearanged
         t = (self.uy + np.sqrt(self.uy**2 + 2*self.g*self.h))/self.g
         xRange = self.ux * t
-        return np.round(t, 3), np.round(xRange, 3)
+        return t, xRange
     
-    def findApogee(self):
-        maximum = np.max(self.ypos)
-        return np.round([self.xpos[self.ypos.index(maximum)], maximum], 3)
+    ##redo
+    def findApogee(self):   
+        #y = self.uy*x/self.ux - self.g*(x/self.ux)**2
+        #dy/dx = self.uy/self.ux - 2*self.g/self.ux**2 * x
+        #(self.uy/self.ux)/(2*self.g/self.ux**2) = x
+        x = (self.uy/self.ux)/(2*self.g/(self.ux**2))
+        y = self.uy*x/self.ux - self.g*(x/self.ux)**2
+        return x, y
+
+    
+    def simulate(self):
+        n = self.xRange/self.freq
+        xGenerator = (n * i for i in range(self.freq+1))
+        for x in xGenerator:
+            self.xpos.append(x)
+            self.ypos.append(self.uy*x/self.ux - self.g*(x/self.ux)**2)
+
 
 # Driver Code
 app = tkinterApp()

@@ -48,15 +48,18 @@ class Projectile():
 
 ## s = ut + a/2t^2 +
 ## 0 = a/2t^2 + ut + h         
-## (-b + sqrt(b**2 - 4ac))/2a          
+## (-b + sqrt(b**2 - 4ac))/2a        
+
+## ux = d/t   s = ut + a/2t**2  
+##  s = uy*d/ux + a/2*(d/ux)**2
 
 class detailedProjectile(Projectile):
-    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod):
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):
        
-        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, timePeriod)
-        self.simulate()
+        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, 0)
         self.t, self.xRange = self.calcRange()
         self.apogee = self.findApogee()
+        self.freq = freq
         
 
     def calcRange(self):
@@ -65,17 +68,30 @@ class detailedProjectile(Projectile):
         xRange = self.ux * t
         return t, xRange
     
-    def findApogee(self):
-        maximum = np.max(self.ypos)
-        return self.xpos[self.ypos.index(maximum)], maximum
+    ##redo
+    def findApogee(self):   
+        #y = self.uy*x/self.ux - self.g*(x/self.ux)**2
+        #dy/dx = self.uy/self.ux - 2*self.g/self.ux**2 * x
+        #(self.uy/self.ux)/(2*self.g/self.ux**2) = x
+        x = (self.uy/self.ux)/(2*self.g/(self.ux**2))
+        y = self.uy*x/self.ux - self.g*(x/self.ux)**2
+        return x, y
+
+    
+    def simulate(self):
+        n = self.xRange/self.freq
+        xGenerator = (n * i for i in range(self.freq+1))
+        for x in xGenerator:
+            self.xpos.append(x)
+            self.ypos.append(self.uy*x/self.ux - self.g*(x/self.ux)**2)
 
 
+proj = detailedProjectile(45, 9.8, 20, 3, 20)
+proj.simulate()
+plt.style.use("Solarize_Light2")
+plt.plot(proj.xpos, proj.ypos, "-o", label="y vs x")
+plt.plot(proj.apogee[0], proj.apogee[1], "ro", label="apogee")
+plt.legend(loc="upper right")
 
-
-proj = detailedProjectile(45, 9.8, 20, 3, 0.1)
-
-plt.plot(proj.xpos, proj.ypos)
-plt.plot(proj.xpos, proj.ypos, "o")
-plt.plot(proj.apogee[0], proj.apogee[1], "x")
 
 plt.show()
