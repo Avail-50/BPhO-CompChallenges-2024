@@ -70,11 +70,11 @@ class detailedProjectile(Projectile):
     
     ##redo
     def findApogee(self):   
-        #y = self.uy*x/self.ux - self.g*(x/self.ux)**2
-        #dy/dx = self.uy/self.ux - 2*self.g/self.ux**2 * x
+        #y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2
+        #dy/dx = self.uy/self.ux - self.g/self.ux**2 * x
         #(self.uy/self.ux)/(2*self.g/self.ux**2) = x
-        x = (self.uy/self.ux)/(2*self.g/(self.ux**2))
-        y = self.uy*x/self.ux - self.g*(x/self.ux)**2
+        x = (self.uy/self.ux)/(self.g/(self.ux**2))
+        y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
         return x, y
 
     
@@ -83,10 +83,10 @@ class detailedProjectile(Projectile):
         xGenerator = (n * i for i in range(self.freq+1))
         for x in xGenerator:
             self.xpos.append(x)
-            self.ypos.append(self.uy*x/self.ux - self.g*(x/self.ux)**2)
+            self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
 
 
-proj = detailedProjectile(45, 9.8, 20, 3, 20)
+proj = detailedProjectile(42, 9.81, 10, 1, 20)
 proj.simulate()
 plt.style.use("Solarize_Light2")
 plt.plot(proj.xpos, proj.ypos, "-o", label="y vs x")

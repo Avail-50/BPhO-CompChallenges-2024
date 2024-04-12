@@ -302,11 +302,11 @@ class detailedProjectile(Projectile):
     
     ##redo
     def findApogee(self):   
-        #y = self.uy*x/self.ux - self.g*(x/self.ux)**2
-        #dy/dx = self.uy/self.ux - 2*self.g/self.ux**2 * x
+        #y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2
+        #dy/dx = self.uy/self.ux - self.g/self.ux**2 * x
         #(self.uy/self.ux)/(2*self.g/self.ux**2) = x
-        x = (self.uy/self.ux)/(2*self.g/(self.ux**2))
-        y = self.uy*x/self.ux - self.g*(x/self.ux)**2
+        x = (self.uy/self.ux)/(self.g/(self.ux**2))
+        y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
         return x, y
 
     
@@ -315,7 +315,7 @@ class detailedProjectile(Projectile):
         xGenerator = (n * i for i in range(self.freq+1))
         for x in xGenerator:
             self.xpos.append(x)
-            self.ypos.append(self.uy*x/self.ux - self.g*(x/self.ux)**2)
+            self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
 
 
 # Driver Code
