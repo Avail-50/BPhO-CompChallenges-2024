@@ -101,25 +101,47 @@ class trajectoryProjectile():
             self.xpos.append(x)
             self.ypos.append(uy*x/ux - self.g*(x/ux)**2)
 
-'''
-class highLowProjectile():
+
+class highLowProjectile(Projectile):
     def __init__(self, xDest, yDest, gravity, launchSpeed, freq):
         self.xDest, self.yDest = xDest, yDest
         self.freq = freq
         self.g = gravity
         self.u = launchSpeed
-        self.ypos = []
-        self.xpos = []
+        self.high, self.low = self.angles()
+        self.lowCoords = self.simulate(self.low)
+        self.highCoords = self.simulate(self.high)
 
-    def high(self):
-        pass
-'''
+    def resolve(self, angle):
+        uy = np.round(np.sin(angle) * self.u, 3)
+        ux = np.round(np.cos(angle) * self.u, 3)
+        return(ux, uy)
+        
+    def angles(self):
+        low = (np.arccos((-self.g*self.xDest**2)/((self.u**2)*np.sqrt(self.yDest**2 + self.xDest**2))) - np.arctan(self.xDest/self.yDest))*0.5
+        high = np.pi - low
+        return low, high
+    
+    def simulate(self, angle):
+        xpos = []
+        ypos = []
+        ux, uy = self.resolve(angle)
+        n = self.xDest/self.freq
+        xGenerator = (n * i for i in range(self.freq+1))
+        for x in xGenerator:
+            xpos.append(x)
+            ypos.append(uy*x/ux - self.g*(x/ux)**2)
+        return xpos, ypos
+
 
 
 missile = trajectoryProjectile(3, 2, 9.8, 20)
 missile.simulate()
+angleMissile = highLowProjectile(3, 2, 9.8, 10, 20)
 plt.style.use("Solarize_Light2")
 plt.plot(missile.xpos, missile.ypos, "-o", label="minU: y vs x")
+plt.plot(angleMissile.lowCoords[0], angleMissile.lowCoords[1], "-o", label="low")
+plt.plot(angleMissile.highCoords[0], angleMissile.highCoords[1], "-o", label="high")
 plt.plot(missile.xDest, missile.yDest, "ro", label="Target")
 plt.legend(loc="upper right")
 
