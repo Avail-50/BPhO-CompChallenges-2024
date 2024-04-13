@@ -55,8 +55,9 @@ class highLowProjectile():
         return(ux, uy)
         
     def angles(self):
-        low = (np.arccos((-self.g*self.xDest**2)/((self.u**2)*np.sqrt(self.yDest**2 + self.xDest**2))) - np.arctan(self.xDest/self.yDest))*0.5
-        high = np.pi - low
+        temp = np.arccos((-self.g*self.xDest**2)/((self.u**2)*np.sqrt(self.yDest**2 + self.xDest**2)))
+        low = (temp - np.arctan(self.xDest/self.yDest))*0.5
+        high = np.pi + (-temp - np.arctan(self.xDest/self.yDest))*0.5
         return low, high
     
     def simulate(self, angle):
@@ -73,15 +74,15 @@ class highLowProjectile():
 
 
 
-missile = trajectoryProjectile(3, 2, 9.8, 20)
+missile = trajectoryProjectile(8, 3, 9.81, 40)
 missile.simulate()
 print(missile.minU)
 print(missile.minθ)
-angleMissile = highLowProjectile(3, 2, 9.8, 15, 20)
+angleMissile = highLowProjectile(8, 3, 9.81, 15, 40)
 print(angleMissile.high)
 print(angleMissile.low)
 plt.style.use("Solarize_Light2")
-plt.plot(missile.xpos, missile.ypos, "-o", label="minU: y vs x")
+plt.plot(missile.xpos, missile.ypos, "-o", label="minU")
 plt.plot(angleMissile.lowCoords[0], angleMissile.lowCoords[1], "-o", label="low")
 plt.plot(angleMissile.highCoords[0], angleMissile.highCoords[1], "-o", label="high")
 plt.plot(missile.xDest, missile.yDest, "ro", label="Target")
