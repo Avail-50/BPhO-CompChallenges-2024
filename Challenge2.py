@@ -86,8 +86,9 @@ class detailedProjectile(Projectile):
             self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
 
 
-proj = detailedProjectile(42, 9.81, 10, 1, 20)
+proj = detailedProjectile(42, 9.81, 10, 1, 50)
 proj.simulate()
+print(proj.ypos)
 plt.style.use("Solarize_Light2")
 plt.plot(proj.xpos, proj.ypos, "-o", label="y vs x")
 plt.plot(proj.apogee[0], proj.apogee[1], "ro", label="apogee")

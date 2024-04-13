@@ -44,9 +44,11 @@ class Projectile():
             time += self.timePeriod
             time = self.suvat(time) 
       
-#mod = Projectile(50, 9.81, 20, 4)
-#mod.simulate()
+mod = Projectile(45, 9.81, 20, 2, 0.02)
+mod.simulate()
+print(mod.ypos)
 
+'''
 def submit():
     angle = launchAngle_var.get()
     grav = gravity_var.get()
@@ -75,11 +77,12 @@ canvas.draw()
 toolbar = NavigationToolbar2Tk(canvas, mw, pack_toolbar=False)
 toolbar.update()
 
-'''
+
 canvas.mpl_connect(
     "key_press_event", lambda event: print(f"you pressed {event.key}"))
 canvas.mpl_connect("key_press_event", key_press_handler)
-'''
+
+
 
 button_quit = tk.Button(master=mw, text="Quit", command=mw.destroy)
 
@@ -120,4 +123,4 @@ toolbar.pack(side=tk.BOTTOM, fill=tk.X)
 canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
 mw.mainloop()
-
+'''
