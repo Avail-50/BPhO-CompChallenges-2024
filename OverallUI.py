@@ -29,7 +29,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (StartPage, Page1, Page2):
+        for F in (StartPage, Page1, Page2, Page3):
   
             frame = F(container, self)
   
@@ -60,18 +60,21 @@ class StartPage(tk.Frame):
         # grid
         label.grid(row = 0, column = 4, padx = 10, pady = 10) 
   
-        button1 = tk.Button(self, text ="Page 1", command=lambda : controller.show_frame(Page1))
+        button1 = tk.Button(self, text ="Challenge 1", command=lambda : controller.show_frame(Page1))
      
         # putting the button in its place by
         # using grid
         button1.grid(row = 1, column = 1, padx = 10, pady = 10)
   
         ## button to show frame 2 with text layout2
-        button2 = tk.Button(self, text ="Page 2", command=lambda : controller.show_frame(Page2))
-     
+        button2 = tk.Button(self, text ="Challenge 2", command=lambda : controller.show_frame(Page2))
+
         # putting the button in its place by
         # using grid
         button2.grid(row = 2, column = 1, padx = 10, pady = 10)
+
+        button3 = tk.Button(self, text ="Challenge 3", command=lambda : controller.show_frame(Page3))
+        button3.grid(row = 3, column = 1, padx = 10, pady = 10)
 
 
 class Page1(tk.Frame):
@@ -248,6 +251,108 @@ class Page2(tk.Frame):
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+# fourth window frame page3
+class Page3(tk.Frame): 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text ="Challenge 3")
+        label.pack(side=tk.TOP)
+  
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
+
+        fig = Figure(figsize=(6, 6), dpi= 100)
+        ax = fig.add_subplot()
+
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
+
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        #launchHieght_var = tk.IntVar()
+        x_var = tk.IntVar()
+        y_var = tk.IntVar()
+
+        frequency_var = tk.IntVar()
+
+        def submit():
+
+            xTarget = x_var.get()
+            yTarget = y_var.get()
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            #height = launchHieght_var.get()
+            freq = frequency_var.get()
+
+            minUProjectile = trajectoryProjectile(xTarget, yTarget, grav, freq)
+            minUProjectile.simulate()
+            highLowAngles = highLowProjectile(xTarget, yTarget, grav, speed, freq)
+
+            ax.clear()
+
+
+            minU_label.config(text="Min U = "+ str(np.round(minUProjectile.minU, 3)))
+            minUAngle_label.config(text="Min U θ = "+ str(np.round(minUProjectile.minθ, 3)))
+            highAngle_label.config(text="High Angle = "+ str(np.round(highLowAngles.high, 3)))
+            lowAngle_label.config(text="Low Angle = "+ str(np.round(highLowAngles.low, 3)))
+            
+            ax.plot(highLowAngles.lowCoords[0], highLowAngles.lowCoords[1], "-o", label="low")
+            ax.plot(highLowAngles.highCoords[0], highLowAngles.highCoords[1], "-o", label="high")
+            ax.plot(minUProjectile.xpos, minUProjectile.ypos, "-o", label="min U")
+            ax.plot(minUProjectile.xDest, minUProjectile.yDest, "rx", label="Target")
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("equal")
+            ax.legend(loc="upper right")
+            
+            
+            canvas.draw()
+        
+        target_label, targetX_entry, targetY_entry = tk.Label(self, text = 'Target (x, y)', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = x_var, font=('calibre',10,'normal')), tk.Entry(self,textvariable = y_var, font=('calibre',10,'normal'))
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        #launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
+
+        freq_label, freq_entry = tk.Label(self, text = 'Frequency (no. of data points)', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+
+        target_label.pack(side=tk.TOP)
+        targetX_entry.pack(side=tk.TOP)
+        targetY_entry.pack(side=tk.TOP)
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        #launchHeight_label.pack(side=tk.TOP)
+        #launchHeight_entry.pack(side=tk.TOP)
+
+        freq_label.pack(side=tk.TOP)
+        freq_entry.pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+
+        minU_label = tk.Label(self, text=("Min U ="), font=('calibre',20, 'bold'))
+        minUAngle_label = tk.Label(self, text=("Min U θ = "), font=('calibre',20, 'bold'))
+        highAngle_label = tk.Label(self, text=("High Angle = "), font=('calibre',20, 'bold'))
+        lowAngle_label = tk.Label(self, text=("Low Angle = "), font=('calibre',20, 'bold'))
+        minU_label.pack(side=tk.TOP)
+        minUAngle_label.pack(side=tk.TOP)
+        highAngle_label.pack(side=tk.TOP)
+        lowAngle_label.pack(side=tk.TOP)
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
         
 
 class Projectile():
@@ -317,6 +422,68 @@ class detailedProjectile(Projectile):
             self.xpos.append(x)
             self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
 
+class trajectoryProjectile():
+    def __init__(self, xDest, yDest, g, freq) -> None:
+        self.xDest = xDest
+        self.yDest = yDest
+        self.g = g
+        self.freq = freq
+        self.minU, self.minθ = self.findMin()
+        self.ypos = []
+        self.xpos = []
+
+
+    def findMin(self):
+        # uy = usin(θ)   ux = ucos(θ)
+        #harmonic formula
+        r = np.sqrt(self.xDest**2 + self.yDest**2)
+        alpha = np.arctan(self.yDest/self.xDest)
+        minU = np.sqrt(self.g*(self.xDest**2)/(r*(1 + np.sin(-alpha))))
+        minθ = (0.5*np.pi + alpha)/2
+        return minU, minθ
+    
+    def simulate(self):
+        n = self.xDest/self.freq
+        xGenerator = (n * i for i in range(self.freq+1))
+        uy = self.minU * np.sin(self.minθ)
+        ux = self.minU * np.cos(self.minθ)
+        for x in xGenerator:
+            self.xpos.append(x)
+            self.ypos.append(uy*x/ux - (self.g/2)*(x/ux)**2)
+
+
+class highLowProjectile():
+    def __init__(self, xDest, yDest, gravity, launchSpeed, freq):
+        self.xDest, self.yDest = xDest, yDest
+        self.freq = freq
+        self.g = gravity
+        self.u = launchSpeed
+        self.high, self.low = self.angles()
+        self.lowCoords = self.simulate(self.low)
+        self.highCoords = self.simulate(self.high)
+
+    def resolve(self, angle):
+        uy = np.round(np.sin(angle) * self.u, 3)
+        ux = np.round(np.cos(angle) * self.u, 3)
+        return(ux, uy)
+        
+    def angles(self):
+        sqrtDiscriminant = np.sqrt((-2 * (self.u**2) * self.yDest)/(self.g * self.xDest**2) + (self.u**4)/(self.g * self.xDest)**2 - 1)
+        high = np.arctan((self.u**2)/(self.g * self.xDest) + sqrtDiscriminant)
+        low = np.arctan((self.u**2)/(self.g * self.xDest) - sqrtDiscriminant)
+        return high, low
+    
+    def simulate(self, angle):
+        xpos = []
+        ypos = []
+        uy = self.u * np.sin(angle)
+        ux = self.u * np.cos(angle)
+        n = self.xDest/self.freq
+        xGenerator = (n * i for i in range(self.freq+1))
+        for x in xGenerator:
+            xpos.append(x)
+            ypos.append(uy*x/ux - (self.g/2)*(x/ux)**2)
+        return xpos, ypos
 
 # Driver Code
 app = tkinterApp()
