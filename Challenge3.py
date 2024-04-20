@@ -55,10 +55,10 @@ class highLowProjectile():
         return(ux, uy)
         
     def angles(self):
-        temp = np.arccos((-self.g*self.xDest**2)/((self.u**2)*np.sqrt(self.yDest**2 + self.xDest**2)))
-        low = (temp - np.arctan(self.xDest/self.yDest))*0.5
-        high = np.pi + (-temp - np.arctan(self.xDest/self.yDest))*0.5
-        return low, high
+        sqrtDiscriminant = np.sqrt((-2 * (self.u**2) * self.yDest)/(self.g * self.xDest**2) + (self.u**4)/(self.g * self.xDest)**2 - 1)
+        high = np.arctan((self.u**2)/(self.g * self.xDest) + sqrtDiscriminant)
+        low = np.arctan((self.u**2)/(self.g * self.xDest) - sqrtDiscriminant)
+        return high, low
     
     def simulate(self, angle):
         xpos = []
