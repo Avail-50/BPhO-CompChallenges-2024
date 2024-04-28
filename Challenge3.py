@@ -48,12 +48,13 @@ class highLowProjectile():
         self.high, self.low = self.angles()
         self.lowCoords = self.simulate(self.low)
         self.highCoords = self.simulate(self.high)
-
+    '''
     def resolve(self, angle):
         uy = np.round(np.sin(angle) * self.u, 3)
         ux = np.round(np.cos(angle) * self.u, 3)
         return(ux, uy)
-        
+    '''
+
     def angles(self):
         sqrtDiscriminant = np.sqrt((-2 * (self.u**2) * self.yDest)/(self.g * self.xDest**2) + (self.u**4)/(self.g * self.xDest)**2 - 1)
         high = np.arctan((self.u**2)/(self.g * self.xDest) + sqrtDiscriminant)

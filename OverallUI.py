@@ -120,7 +120,7 @@ class Page1(tk.Frame):
             height = launchHieght_var.get()
             tP = timePeriod_var.get()
 
-            mod = Projectile(angle, grav, speed, height, float(tP))
+            mod = timeProjectile(angle, grav, speed, height, float(tP))
             mod.simulate()
             ax.clear()
             ax.plot(mod.xpos, mod.ypos)
@@ -156,9 +156,7 @@ class Page1(tk.Frame):
 
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-  
-  
-  
+
   
 # third window frame page2
 class Page2(tk.Frame): 
@@ -199,7 +197,7 @@ class Page2(tk.Frame):
             height = launchHieght_var.get()
             freq = frequency_var.get()
 
-            dP = detailedProjectile(angle, grav, speed, height, freq)
+            dP = apogeeProjectile(angle, grav, speed, height, freq)
             dP.simulate()
             ax.clear()
 
@@ -354,8 +352,7 @@ class Page3(tk.Frame):
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         
-
-class Projectile():
+class timeProjectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
         self.launchAngle = launchAngle * np.pi/180
         self.g = gravity       
@@ -390,30 +387,30 @@ class Projectile():
             time += self.timePeriod
             time = self.suvat(time) 
 
-class detailedProjectile(Projectile):
-    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):
-       
-        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, 0)
-        self.t, self.xRange = self.calcRange()
-        self.apogee = self.findApogee()
+class freqProjectile():
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq) -> None:
+        self.launchAngle = launchAngle * np.pi/180
+        self.g = gravity       
+        self.ux, self.uy = self.resolve(launchSpeed)
+        self.h = launchHeight
+        self.ypos = []
+        self.xpos = []
         self.freq = freq
-        
+        self.t, self.xRange = self.calcRange()
+
+    def resolve(self, u):
+        uy = np.round(np.sin(self.launchAngle) * u, 2)
+        ux = np.round(np.cos(self.launchAngle) * u, 2)
+        return(ux, uy)
+      
+    def xCoords(self, time):
+        self.xpos.append(self.ux * time)
 
     def calcRange(self):
         #quadratic formula rearanged
         t = (self.uy + np.sqrt(self.uy**2 + 2*self.g*self.h))/self.g
         xRange = self.ux * t
         return t, xRange
-    
-    ##redo
-    def findApogee(self):   
-        #y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2
-        #dy/dx = self.uy/self.ux - self.g/self.ux**2 * x
-        #(self.uy/self.ux)/(2*self.g/self.ux**2) = x
-        x = (self.uy/self.ux)/(self.g/(self.ux**2))
-        y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
-        return x, y
-
     
     def simulate(self):
         n = self.xRange/self.freq
@@ -422,6 +419,16 @@ class detailedProjectile(Projectile):
             self.xpos.append(x)
             self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
 
+class apogeeProjectile(freqProjectile):
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):      
+        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, freq)
+        self.apogee = self.findApogee()       
+    
+    def findApogee(self):   
+        x = (self.uy/self.ux)/(self.g/(self.ux**2))
+        y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
+        return x, y
+    
 class trajectoryProjectile():
     def __init__(self, xDest, yDest, g, freq) -> None:
         self.xDest = xDest
