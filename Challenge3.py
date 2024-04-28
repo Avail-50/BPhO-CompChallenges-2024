@@ -74,16 +74,16 @@ class highLowProjectile():
 
 
 
-missile = trajectoryProjectile(8, 3, 9.81, 40)
+missile = trajectoryProjectile(100, -20, 9.81, 40)
 missile.simulate()
 print(missile.minU)
 print(missile.minθ)
-angleMissile = highLowProjectile(8, 3, 9.81, 15, 40)
+angleMissile = highLowProjectile(100, -20, 9.81, 40, 40)
 print(angleMissile.high)
 print(angleMissile.low)
 plt.style.use("Solarize_Light2")
 plt.plot(missile.xpos, missile.ypos, "-o", label="minU")
-plt.plot(angleMissile.lowCoords, "-o", label="low")
+plt.plot(angleMissile.lowCoords[0], angleMissile.lowCoords[1], "-o", label="low")
 plt.plot(angleMissile.highCoords[0], angleMissile.highCoords[1], "-o", label="high")
 plt.plot(missile.xDest, missile.yDest, "ro", label="Target")
 plt.legend(loc="upper right")
