@@ -29,7 +29,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (StartPage, Page1, Page2, Page3):
+        for F in (StartPage, Page1, Page2, Page3, Page4):
   
             frame = F(container, self)
   
@@ -75,6 +75,9 @@ class StartPage(tk.Frame):
 
         button3 = tk.Button(self, text ="Challenge 3", command=lambda : controller.show_frame(Page3))
         button3.grid(row = 3, column = 1, padx = 10, pady = 10)
+
+        button4 = tk.Button(self, text ="Challenge 4", command=lambda : controller.show_frame(Page4))
+        button4.grid(row = 4, column = 1, padx = 10, pady = 10)
 
 
 class Page1(tk.Frame):
@@ -351,7 +354,100 @@ class Page3(tk.Frame):
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+# fifth window frame page3
+class Page4(tk.Frame): 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text ="Challenge 4")
+        label.pack(side=tk.TOP)
+  
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
+
+        fig = Figure(figsize=(6, 6), dpi= 100)
+        ax = fig.add_subplot()
+
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
+
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        launchAngle_var = tk.IntVar()
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        launchHieght_var = tk.IntVar()
+
+        frequency_var = tk.IntVar()
+
+        def submit():
+
+            angle = launchAngle_var.get()
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            height = launchHieght_var.get()
+            freq = frequency_var.get()
+
+            fP = freqProjectile(angle, grav, speed, height, freq)
+            fP.simulate()
+            mrP = maxRangeProjectile(grav, speed, height, freq)
+            mrP.simulate()
+            ax.clear()
+
+            range_label.config(text="Max Range = "+ str(np.round(mrP.xRange, 3)))
+            airTime_label.config(text="Max Air Time = "+ str(np.round(mrP.t, 3)))
+            maxTheta_label.config(text="Max θ = "+ str(np.round(mrP.launchAngle * 180/np.pi, 1)))
+
+            ax.plot(fP.xpos, fP.ypos, "-o", label="θ = "+str(angle)+"°")
+            ax.plot(mrP.xpos, mrP.ypos, "--", label="Max range")
+            
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("equal")
+            ax.legend(loc="upper right")
+            
+            
+            canvas.draw()
         
+        launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
+
+        tP_label, tP_entry = tk.Label(self, text = 'Frequency', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+
+        launchAngle_label.pack(side=tk.TOP)
+        launchAngle_entry.pack(side=tk.TOP)
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        launchHeight_label.pack(side=tk.TOP)
+        launchHeight_entry.pack(side=tk.TOP)
+
+        tP_label.pack(side=tk.TOP)
+        tP_entry.pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+
+        range_label = tk.Label(self, text=("Max Range ="), font=('calibre',15, 'bold'))
+        airTime_label = tk.Label(self, text=("Max Air Time ="), font=('calibre',15, 'bold'))
+        maxTheta_label = tk.Label(self, text=("Max θ = "), font=('calibre',15, 'bold'))
+        range_label.pack(side=tk.TOP)
+        airTime_label.pack(side=tk.TOP)
+        maxTheta_label.pack(side=tk.TOP)
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
 class timeProjectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
         self.launchAngle = launchAngle * np.pi/180
@@ -390,7 +486,8 @@ class timeProjectile():
 class freqProjectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq) -> None:
         self.launchAngle = launchAngle * np.pi/180
-        self.g = gravity       
+        self.g = gravity
+        self.u = launchSpeed       
         self.ux, self.uy = self.resolve(launchSpeed)
         self.h = launchHeight
         self.ypos = []
@@ -402,9 +499,6 @@ class freqProjectile():
         uy = np.round(np.sin(self.launchAngle) * u, 2)
         ux = np.round(np.cos(self.launchAngle) * u, 2)
         return(ux, uy)
-      
-    def xCoords(self, time):
-        self.xpos.append(self.ux * time)
 
     def calcRange(self):
         #quadratic formula rearanged
@@ -491,6 +585,16 @@ class highLowProjectile():
             xpos.append(x)
             ypos.append(uy*x/ux - (self.g/2)*(x/ux)**2)
         return xpos, ypos
+
+class maxRangeProjectile(freqProjectile):
+    def __init__(self, gravity, launchSpeed, launchHeight, freq):
+        super().__init__(0, gravity, launchSpeed, launchHeight, freq)
+        self.launchAngle = self.optimumAngle()
+        self.ux, self.uy = self.resolve(launchSpeed)
+        self.t, self.xRange = self.calcRange()
+
+    def optimumAngle(self):
+        return np.arcsin(1/np.sqrt(2 + 2*self.g*self.h/(self.u**2)))
 
 # Driver Code
 app = tkinterApp()
