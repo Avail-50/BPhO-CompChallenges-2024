@@ -56,7 +56,11 @@ class highLowProjectile():
     '''
 
     def angles(self):
+        temp = (self.g * self.xDest**2)/(2*self.u**2)
+        sqrtDiscriminant = np.sqrt(self.xDest**2 - 4*temp*(temp + self.yDest))
+        '''
         sqrtDiscriminant = np.sqrt((-2 * (self.u**2) * self.yDest)/(self.g * self.xDest**2) + (self.u**4)/(self.g * self.xDest)**2 - 1)
+        '''
         high = np.arctan((self.u**2)/(self.g * self.xDest) + sqrtDiscriminant)
         low = np.arctan((self.u**2)/(self.g * self.xDest) - sqrtDiscriminant)
         return high, low
