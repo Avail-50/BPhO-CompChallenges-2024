@@ -7,7 +7,7 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 
-
+# changed to timeProjectile
 
 class Projectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
@@ -47,80 +47,3 @@ class Projectile():
 mod = Projectile(45, 9.81, 20, 2, 0.02)
 mod.simulate()
 print(mod.ypos)
-
-'''
-def submit():
-    angle = launchAngle_var.get()
-    grav = gravity_var.get()
-    speed = launchSpeed_var.get()
-    height = launchHieght_var.get()
-    tP = timePeriod_var.get()
-
-    mod = Projectile(angle, grav, speed, height, float(tP))
-    mod.simulate()
-    ax.clear()
-    ax.plot(mod.xpos, mod.ypos)
-    canvas.draw()
-
-mw = tk.Tk()
-mw.title("Projectile: No Air Resistance")
-
-fig = Figure(figsize=(6, 6), dpi= 100)
-ax = fig.add_subplot()
-
-ax.set_xlabel("x /m")
-ax.set_ylabel("y /m")
-
-canvas = FigureCanvasTkAgg(fig, master=mw)
-canvas.draw()
-
-toolbar = NavigationToolbar2Tk(canvas, mw, pack_toolbar=False)
-toolbar.update()
-
-
-canvas.mpl_connect(
-    "key_press_event", lambda event: print(f"you pressed {event.key}"))
-canvas.mpl_connect("key_press_event", key_press_handler)
-
-
-
-button_quit = tk.Button(master=mw, text="Quit", command=mw.destroy)
-
-launchAngle_var = tk.IntVar()
-gravity_var = tk.IntVar()
-launchSpeed_var = tk.IntVar()
-launchHieght_var = tk.IntVar()
-
-timePeriod_var = tk.StringVar()
-
-
-launchAngle_label, launchAngle_entry = tk.Label(mw, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(mw,textvariable = launchAngle_var, font=('calibre',10,'normal'))
-gravity_label, gravity_entry = tk.Label(mw, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(mw,textvariable = gravity_var, font=('calibre',10,'normal'))
-launchSpeed_label, launchSpeed_entry = tk.Label(mw, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(mw,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
-launchHeight_label, launchHeight_entry = tk.Label(mw, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(mw,textvariable = launchHieght_var, font=('calibre',10,'normal'))
-
-tP_label, tP_entry = tk.Label(mw, text = 'Time Period', font=('calibre',10, 'bold')), tk.Entry(mw,textvariable = timePeriod_var, font=('calibre',10,'normal'))
-
-sub_btn=tk.Button(mw, text = 'Submit', command = submit)
-
-
-launchAngle_label.pack(side=tk.TOP)
-launchAngle_entry.pack(side=tk.TOP)
-gravity_label.pack(side=tk.TOP)
-gravity_entry.pack(side=tk.TOP)
-launchSpeed_label.pack(side=tk.TOP)
-launchSpeed_entry.pack(side=tk.TOP)
-launchHeight_label.pack(side=tk.TOP)
-launchHeight_entry.pack(side=tk.TOP)
-
-tP_label.pack(side=tk.TOP)
-tP_entry.pack(side=tk.TOP)
-
-sub_btn.pack(side=tk.TOP)
-
-button_quit.pack(side=tk.BOTTOM)
-toolbar.pack(side=tk.BOTTOM, fill=tk.X)
-canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-mw.mainloop()
-'''

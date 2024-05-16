@@ -7,8 +7,6 @@ from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 
-
-
 class timeProjectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
         self.launchAngle = launchAngle * np.pi/180
@@ -82,13 +80,11 @@ class apogeeProjectile(freqProjectile):
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):      
         super().__init__(launchAngle, gravity, launchSpeed, launchHeight, freq)
         self.apogee = self.findApogee()       
-
     
     def findApogee(self):   
         x = (self.uy/self.ux)/(self.g/(self.ux**2))
         y = self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
         return x, y
-
 
 proj = apogeeProjectile(42, 9.81, 10, 1, 50)
 print(proj.apogee)
