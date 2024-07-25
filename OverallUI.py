@@ -29,7 +29,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (StartPage, Page1, Page2, Page3, Page4):
+        for F in (StartPage, Page1, Page2, Page3, Page4, Page5):
   
             frame = F(container, self)
   
@@ -78,6 +78,9 @@ class StartPage(tk.Frame):
 
         button4 = tk.Button(self, text ="Challenge 4", command=lambda : controller.show_frame(Page4))
         button4.grid(row = 4, column = 1, padx = 10, pady = 10)
+
+        button5 = tk.Button(self, text ="Challenge 5", command=lambda : controller.show_frame(Page5))
+        button5.grid(row = 5, column = 1, padx = 10, pady = 10)
 
 
 class Page1(tk.Frame):
@@ -131,8 +134,7 @@ class Page1(tk.Frame):
             ax.set_ylabel("y /m")
             ax.set_aspect("equal")
             if boundParab_var.get() == 1:
-                p = boundingParabola(grav, speed, height, int(1/float(tP)))
-                
+                p = boundingParabola(grav, speed, height, int(1/float(tP))) 
                 ax.plot(p.xpos, p.ypos)
             canvas.draw()
 
@@ -159,7 +161,7 @@ class Page1(tk.Frame):
         tP_entry.pack(side=tk.TOP)
 
         boundParab_var = tk.IntVar()
-        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.RIGHT)
+        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
 
         sub_btn.pack(side=tk.TOP)
 
@@ -221,6 +223,9 @@ class Page2(tk.Frame):
             ax.set_ylabel("y /m")
             ax.set_aspect("equal")
             ax.legend(loc="upper right")
+            if boundParab_var.get() == 1:
+                p = boundingParabola(grav, speed, height, freq) 
+                ax.plot(p.xpos, p.ypos)
             
             
             canvas.draw()
@@ -230,7 +235,7 @@ class Page2(tk.Frame):
         launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
         launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
 
-        tP_label, tP_entry = tk.Label(self, text = 'Frequency', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+        tP_label, tP_entry = tk.Label(self, text = 'Sample Rate', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
 
         sub_btn=tk.Button(self, text = 'Submit', command = submit)
 
@@ -246,6 +251,9 @@ class Page2(tk.Frame):
 
         tP_label.pack(side=tk.TOP)
         tP_entry.pack(side=tk.TOP)
+
+        boundParab_var = tk.IntVar()
+        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
 
         sub_btn.pack(side=tk.TOP)
 
@@ -417,7 +425,9 @@ class Page4(tk.Frame):
             ax.set_ylabel("y /m")
             ax.set_aspect("equal")
             ax.legend(loc="upper right")
-            
+            if boundParab_var.get() == 1:
+                p = boundingParabola(grav, speed, height, freq) 
+                ax.plot(p.xpos, p.ypos, label=boundingParabola)
             
             canvas.draw()
         
@@ -443,6 +453,9 @@ class Page4(tk.Frame):
         tP_label.pack(side=tk.TOP)
         tP_entry.pack(side=tk.TOP)
 
+        boundParab_var = tk.IntVar()
+        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
+
         sub_btn.pack(side=tk.TOP)
 
 
@@ -452,6 +465,75 @@ class Page4(tk.Frame):
         range_label.pack(side=tk.TOP)
         airTime_label.pack(side=tk.TOP)
         maxTheta_label.pack(side=tk.TOP)
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+# sixth window frame page5
+class Page5(tk.Frame): 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text ="Challenge 5")
+        label.pack(side=tk.TOP)
+  
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
+
+        fig = Figure(figsize=(6, 6), dpi= 100)
+        ax = fig.add_subplot()
+
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
+
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        launchHieght_var = tk.IntVar()
+
+        frequency_var = tk.IntVar()
+
+        def submit():
+
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            height = launchHieght_var.get()
+            freq = frequency_var.get()
+
+            p = boundingParabola(grav, speed, height, freq) 
+            ax.set_aspect("equal")
+            ax.plot(p.xpos, p.ypos)
+            
+            canvas.draw()
+        
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
+
+        tP_label, tP_entry = tk.Label(self, text = 'Sample Rate', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        launchHeight_label.pack(side=tk.TOP)
+        launchHeight_entry.pack(side=tk.TOP)
+
+        tP_label.pack(side=tk.TOP)
+        tP_entry.pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+
+        message_label = tk.Label(self, text=("*Integrated with other challenges"), font=('calibre',10))
+        message_label.pack(side=TOP)
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
