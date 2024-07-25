@@ -4,7 +4,7 @@
 - [x] Challenge 2
 - [x] Challenge 3
 - [x] Challenge 4
-- [ ] Challenge 5
+- [x] Challenge 5
 - [ ] Challenge 6
 - [ ] Challenge 7
 - [ ] Challenge 8
@@ -12,3 +12,10 @@
 - [ ] Extensions
 - [ ] Big Challenge
 - [ ] Final video?
+
+
+qol improvements:
+- select between degrees and radians
+- ability to have saved values
+- input validation
+- challenge 3, say if speed is to low to reach goal
