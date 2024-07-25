@@ -130,6 +130,10 @@ class Page1(tk.Frame):
             ax.set_xlabel("x /m")
             ax.set_ylabel("y /m")
             ax.set_aspect("equal")
+            if boundParab_var.get() == 1:
+                p = boundingParabola(grav, speed, height, int(1/float(tP)))
+                
+                ax.plot(p.xpos, p.ypos)
             canvas.draw()
 
         launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
@@ -153,6 +157,9 @@ class Page1(tk.Frame):
 
         tP_label.pack(side=tk.TOP)
         tP_entry.pack(side=tk.TOP)
+
+        boundParab_var = tk.IntVar()
+        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.RIGHT)
 
         sub_btn.pack(side=tk.TOP)
 
@@ -595,6 +602,20 @@ class maxRangeProjectile(freqProjectile):
 
     def optimumAngle(self):
         return np.arcsin(1/np.sqrt(2 + 2*self.g*self.h/(self.u**2)))
+    
+class boundingParabola():
+    def __init__(self, gravity, launchSpeed, launchHeight, freq) -> None:
+        self.g = gravity
+        self.u = launchSpeed
+        self.h = launchHeight
+        self.freq = freq
+        self.xpos, self.ypos = self.bound()
+
+    def bound(self):
+        xMax = np.sqrt(((self.u**4)/self.g + 2*self.h*self.u**2)/self.g)
+        xpos = np.linspace(0, xMax, self.freq)
+        ypos = list(np.round(((self.u**2)/(2*self.g) - self.g*x**2/(2*self.u**2) + self.h), 3) for x in xpos)
+        return xpos, ypos
 
 # Driver Code
 app = tkinterApp()

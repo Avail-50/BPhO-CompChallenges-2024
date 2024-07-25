@@ -43,12 +43,13 @@ class boundingParabola():
         self.u = launchSpeed
         self.h = launchHeight
         self.freq = freq
+        self.xpos, self.ypos = self.bound()
 
     def bound(self):
         xMax = np.sqrt(((self.u**4)/self.g + 2*self.h*self.u**2)/self.g)
         xpos = np.linspace(0, xMax, self.freq)
-        ypos = list(((self.u**2)/(2*self.g) - self.g*x**2/(2*self.u**2) + self.h) for x in xpos)
+        ypos = list(np.round(((self.u**2)/(2*self.g) - self.g*x**2/(2*self.u**2) + self.h), 3) for x in xpos)
         return xpos, ypos
     
 p = boundingParabola(9.81, 40, 5, 20)
-print(p.bound())
+print(p.xpos, p.ypos)
