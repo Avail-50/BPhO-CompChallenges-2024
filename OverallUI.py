@@ -328,6 +328,9 @@ class Page3(tk.Frame):
             ax.set_ylabel("y /m")
             ax.set_aspect("equal")
             ax.legend(loc="upper right")
+            if boundParab_var.get() == 1:
+                p = boundingParabola(grav, speed, 0, freq) 
+                ax.plot(p.xpos, p.ypos, label="boundingParabola")
             
             
             canvas.draw()
@@ -354,6 +357,9 @@ class Page3(tk.Frame):
 
         freq_label.pack(side=tk.TOP)
         freq_entry.pack(side=tk.TOP)
+
+        boundParab_var = tk.IntVar()
+        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
 
         sub_btn.pack(side=tk.TOP)
 
@@ -427,7 +433,7 @@ class Page4(tk.Frame):
             ax.legend(loc="upper right")
             if boundParab_var.get() == 1:
                 p = boundingParabola(grav, speed, height, freq) 
-                ax.plot(p.xpos, p.ypos, label=boundingParabola)
+                ax.plot(p.xpos, p.ypos, label="Bounding Parabola")
             
             canvas.draw()
         
