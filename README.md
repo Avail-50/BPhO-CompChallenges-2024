@@ -1,10 +1,10 @@
 # BPhO-CompChallenges-2024
 
-- [x] Challenge 1
-- [x] Challenge 2
-- [x] Challenge 3
-- [x] Challenge 4
-- [x] Challenge 5
+- [x] Challenge 1 (tested)
+- [x] Challenge 2 (tested)
+- [x] Challenge 3 (tested)
+- [x] Challenge 4 (tested)
+- [x] Challenge 5 (tested)
 - [ ] Challenge 6
 - [ ] Challenge 7
 - [ ] Challenge 8
