@@ -58,16 +58,25 @@ class maxRangeProjectile(freqProjectile):
     def optimumAngle(self):
         return np.arcsin(1/np.sqrt(2 + 2*self.g*self.h/(self.u**2)))
     
+class distanceCalcProj(freqProjectile):
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):
+        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, freq)
+
+    def speedOverTime(self):
+        #v = np.sqrt((self.uy - self.g*x)**2 + (self.ux)**2)
+        pass
+
+
 
 maxProj = maxRangeProjectile(9.81, 10, 2, 100)
 maxProj.simulate()
 
-proj = apogeeProjectile(15, 9.81, 10, 2, 100)
+proj = apogeeProjectile(60, 9.81, 10, 2, 100)
 proj.simulate()
 plt.style.use("Solarize_Light2")
-plt.plot(proj.xpos, proj.ypos, "-o", label="y vs x")
+plt.plot(proj.xpos, proj.ypos, "-", label="y vs x")
 plt.plot(proj.apogee[0], proj.apogee[1], "ro", label="apogee")
-plt.plot(maxProj.xpos, maxProj.ypos, "-o", label="max range")
+plt.plot(maxProj.xpos, maxProj.ypos, "--", label="max range")
 plt.legend(loc="upper right")
 
 
