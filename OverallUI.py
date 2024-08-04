@@ -58,7 +58,7 @@ class StartPage(tk.Frame):
          
         # putting the grid in its place by using
         # grid
-        label.grid(row = 0, column = 4, padx = 10, pady = 10) 
+        label.grid(row = 0, column = 3, padx = 10, pady = 10) 
   
         button1 = tk.Button(self, text ="Challenge 1", command=lambda : controller.show_frame(Page1))
      
@@ -80,7 +80,13 @@ class StartPage(tk.Frame):
         button4.grid(row = 4, column = 1, padx = 10, pady = 10)
 
         button5 = tk.Button(self, text ="Challenge 5", command=lambda : controller.show_frame(Page5))
+        label5 = tk.Label(self, text ="*integrated with others")
         button5.grid(row = 5, column = 1, padx = 10, pady = 10)
+        label5.grid(row = 5, column = 2, padx = 0, pady = 10)
+
+        label6 = tk.Label(self, text ="Challenge 6 (integrated with others)")
+        label6.grid(row = 6, column = 1, padx = 10, pady = 10)
+
 
 
 class Page1(tk.Frame):
@@ -216,6 +222,7 @@ class Page2(tk.Frame):
             range_label.config(text="Range = "+ str(np.round(dP.xRange, 3)))
             airTime_label.config(text="Air Time = "+ str(np.round(dP.t, 3)))
             apogee_label.config(text="Apogee = ["+ str(np.round(dP.apogee[0], 3)) + ", " +str(np.round(dP.apogee[1], 3))+"]")
+            pathLength_label.config(text="Path Length = " + str(np.round(dP.pathLength, 3)))
 
             ax.plot(dP.xpos, dP.ypos, "-o", label="y vs x")
             ax.plot(dP.apogee[0], dP.apogee[1], "ro", label="apogee")
@@ -258,12 +265,14 @@ class Page2(tk.Frame):
         sub_btn.pack(side=tk.TOP)
 
 
-        range_label = tk.Label(self, text=("Range ="), font=('calibre',20, 'bold'))
-        airTime_label = tk.Label(self, text=("Air Time ="), font=('calibre',20, 'bold'))
-        apogee_label = tk.Label(self, text=("Apogee ="), font=('calibre',20, 'bold'))
+        range_label = tk.Label(self, text=("Range ="), font=('calibre',10, 'bold'))
+        airTime_label = tk.Label(self, text=("Air Time ="), font=('calibre',10, 'bold'))
+        apogee_label = tk.Label(self, text=("Apogee ="), font=('calibre',10, 'bold'))
+        pathLength_label = tk.Label(self, text=("Path Length ="), font=('calibre',10, 'bold'))
         range_label.pack(side=tk.TOP)
         airTime_label.pack(side=tk.TOP)
         apogee_label.pack(side=tk.TOP)
+        pathLength_label.pack(side=tk.TOP)
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
@@ -364,10 +373,10 @@ class Page3(tk.Frame):
         sub_btn.pack(side=tk.TOP)
 
 
-        minU_label = tk.Label(self, text=("Min U ="), font=('calibre',20, 'bold'))
-        minUAngle_label = tk.Label(self, text=("Min U θ = "), font=('calibre',20, 'bold'))
-        highAngle_label = tk.Label(self, text=("High Angle = "), font=('calibre',20, 'bold'))
-        lowAngle_label = tk.Label(self, text=("Low Angle = "), font=('calibre',20, 'bold'))
+        minU_label = tk.Label(self, text=("Min U ="), font=('calibre',10, 'bold'))
+        minUAngle_label = tk.Label(self, text=("Min U θ = "), font=('calibre',10, 'bold'))
+        highAngle_label = tk.Label(self, text=("High Angle = "), font=('calibre',10, 'bold'))
+        lowAngle_label = tk.Label(self, text=("Low Angle = "), font=('calibre',10, 'bold'))
         minU_label.pack(side=tk.TOP)
         minUAngle_label.pack(side=tk.TOP)
         highAngle_label.pack(side=tk.TOP)
@@ -423,6 +432,7 @@ class Page4(tk.Frame):
             range_label.config(text="Max Range = "+ str(np.round(mrP.xRange, 3)))
             airTime_label.config(text="Max Air Time = "+ str(np.round(mrP.t, 3)))
             maxTheta_label.config(text="Max θ = "+ str(np.round(mrP.launchAngle * 180/np.pi, 1)))
+            maxPathLength_label.config(text="Path Length = " + str(np.round(mrP.pathLength, 3)))
 
             ax.plot(fP.xpos, fP.ypos, "-o", label="θ = "+str(angle)+"°")
             ax.plot(mrP.xpos, mrP.ypos, "--", label="Max range")
@@ -465,12 +475,14 @@ class Page4(tk.Frame):
         sub_btn.pack(side=tk.TOP)
 
 
-        range_label = tk.Label(self, text=("Max Range ="), font=('calibre',15, 'bold'))
-        airTime_label = tk.Label(self, text=("Max Air Time ="), font=('calibre',15, 'bold'))
-        maxTheta_label = tk.Label(self, text=("Max θ = "), font=('calibre',15, 'bold'))
+        range_label = tk.Label(self, text=("Max Range ="), font=('calibre',10, 'bold'))
+        airTime_label = tk.Label(self, text=("Max Air Time ="), font=('calibre',10, 'bold'))
+        maxTheta_label = tk.Label(self, text=("Max θ = "), font=('calibre',10, 'bold'))
+        maxPathLength_label = tk.Label(self, text=("Max Path Length = "), font=('calibre',10, 'bold'))
         range_label.pack(side=tk.TOP)
         airTime_label.pack(side=tk.TOP)
         maxTheta_label.pack(side=tk.TOP)
+        maxPathLength_label.pack(side=tk.TOP)
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
@@ -589,6 +601,7 @@ class freqProjectile():
         self.xpos = []
         self.freq = freq
         self.t, self.xRange = self.calcRange()
+        self.pathLength = self.findDistance()
 
     def resolve(self, u):
         uy = np.round(np.sin(self.launchAngle) * u, 2)
@@ -607,6 +620,13 @@ class freqProjectile():
         for x in xGenerator:
             self.xpos.append(x)
             self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
+
+    def findDistance(self):
+        z1 = self.uy - self.g * self.t
+        z2 = self.uy
+        lim1 = -z1*np.sqrt(self.ux**2 + z1**2)/(2*self.g) - (self.ux**2)/(2*self.g) * np.log(np.fabs((np.sqrt(self.ux**2 + z1**2)+z1))/self.ux)
+        lim2 = -z2*np.sqrt(self.ux**2 + z2**2)/(2*self.g) - (self.ux**2)/(2*self.g) * np.log(np.fabs((np.sqrt(self.ux**2 + z2**2)+z2))/self.ux)
+        return lim1-lim2
 
 class apogeeProjectile(freqProjectile):
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq):      
