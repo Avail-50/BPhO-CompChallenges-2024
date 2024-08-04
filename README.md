@@ -5,7 +5,7 @@
 - [x] Challenge 3 (tested)
 - [x] Challenge 4 (tested)
 - [x] Challenge 5 (tested)
-- [ ] Challenge 6
+- [x] Challenge 6 (tested)
 - [ ] Challenge 7
 - [ ] Challenge 8
 - [ ] Challenge 9
