@@ -66,13 +66,34 @@ class distanceCalcProj(freqProjectile):
         #v = np.sqrt((self.uy - self.g*x)**2 + (self.ux)**2)
         pass
 
-
+    '''
+    def findDistance(self):
+        z1 = np.tan(self.launchAngle)
+        print("z1", z1)
+        
+        z2 = z1 - ((self.g * self.xRange)/self.u**2) * (1 * z1**2)
+        print("z2", z2)
+        lim1 = (0.5)*np.log(np.fabs(np.sqrt(1 + z1**2)+z1)) + 0.5*z1*np.sqrt(1 + z1**2)
+        lim2 = (0.5)*np.log(np.fabs(np.sqrt(1 + z2**2)+z2)) + 0.5*z2*np.sqrt(1 + z2**2)
+        return ((self.u**2)/(self.g*(1+z1**2))) * (lim1 - lim2)
+    '''
+    
+    def findDistanceVer2(self):
+        z1 = self.uy - self.g * self.t
+        z2 = self.uy
+        lim1 = -z1*np.sqrt(self.ux**2 + z1**2)/(2*self.g) - (self.ux**2)/(2*self.g) * np.log(np.fabs((np.sqrt(self.ux**2 + z1**2)+z1))/self.ux)
+        lim2 = -z2*np.sqrt(self.ux**2 + z2**2)/(2*self.g) - (self.ux**2)/(2*self.g) * np.log(np.fabs((np.sqrt(self.ux**2 + z2**2)+z2))/self.ux)
+        return lim1-lim2
 
 maxProj = maxRangeProjectile(9.81, 10, 2, 100)
 maxProj.simulate()
 
 proj = apogeeProjectile(60, 9.81, 10, 2, 100)
 proj.simulate()
+
+disProj = distanceCalcProj(60, 9.81, 10, 2, 100)
+
+print(disProj.findDistanceVer2())
 plt.style.use("Solarize_Light2")
 plt.plot(proj.xpos, proj.ypos, "-", label="y vs x")
 plt.plot(proj.apogee[0], proj.apogee[1], "ro", label="apogee")
