@@ -65,15 +65,21 @@ class freqProjectile():
     def calcRange(self):
         #quadratic formula rearanged
         t = (self.uy + np.sqrt(self.uy**2 + 2*self.g*self.h))/self.g
-        xRange = self.ux * t
+        xRange = self.getXFromT(t)
         return t, xRange
+    
+    def getYFromX(self, x):
+        return self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
+    
+    def getXFromT(self, t):
+        return t * self.ux
     
     def simulate(self):
         n = self.xRange/self.freq
         xGenerator = (n * i for i in range(self.freq+1))
         for x in xGenerator:
             self.xpos.append(x)
-            self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
+            self.ypos.append(self.getYFromX(x))
 
 
 class apogeeProjectile(freqProjectile):

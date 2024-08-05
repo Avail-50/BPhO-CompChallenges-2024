@@ -526,6 +526,7 @@ class Page5(tk.Frame):
             height = launchHieght_var.get()
             freq = frequency_var.get()
 
+            ax.clear()
             p = boundingParabola(grav, speed, height, freq) 
             ax.set_aspect("equal")
             ax.plot(p.xpos, p.ypos)
@@ -568,25 +569,24 @@ class Page7(tk.Frame):
         button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
         button1.pack(side=tk.BOTTOM)
 
-        fig1 = Figure(figsize=(6, 6), dpi= 100)
+        fig = Figure(figsize=(6, 6), dpi= 100)
 
-        gx = fig1.add_subplot()
+        gx = fig.add_subplot(2,1,1)
         gx.set_xlabel("t /s")
         gx.set_ylabel("r /m")
-        gx.set_aspect("equal")
+        gx.set_aspect("auto")
 
-        #fig2 = Figure(figsize=(6, 6), dpi= 100)
-        #ax = fig2.add_subplot()
-        #ax.set_xlabel("x /m")
-        #ax.set_ylabel("y /m")
-        #ax.set_aspect("equal")
+        ax = fig.add_subplot(2, 1, 2)
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+        ax.set_aspect("auto")
 
-        canvas1 = FigureCanvasTkAgg(fig1, master=self)
-        canvas1.draw()
-        canvas2 = FigureCanvasTkAgg(fig2, master=self)
-        canvas2.draw()
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+        #canvas2 = FigureCanvasTkAgg(fig2, master=self)
+        #canvas2.draw()
 
-        toolbar = NavigationToolbar2Tk(canvas1, self, pack_toolbar=False)
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
         toolbar.update()
 
 
@@ -594,7 +594,7 @@ class Page7(tk.Frame):
         launchSpeed_var = tk.IntVar()
         launchAngle_var = tk.IntVar()
 
-        frequency_var = tk.IntVar()
+        #frequency_var = tk.IntVar()
 
         def submit():
 
@@ -603,15 +603,32 @@ class Page7(tk.Frame):
             angle = launchAngle_var.get()
             
             val = rangePerTime(speed, grav, angle)
+            projectile = freqProjectile(angle, grav, speed, 0, 50)
+            projectile.simulate()
 
             
-            gx.set_aspect("equal")
-            gx.plot(val[0], val[1])
+            gx.set_aspect("auto")
+            gx.plot(val[0], val[1], "-", label= "θ = " + str(angle))
+            ax.plot(projectile.xpos, projectile.ypos, "-", label= "θ = "+ str(angle))
+            print(val[2])
             if val[2] != None:
-                gx.plot(val[2][0], val[2][1])
-                gx.plot(val[3][0], val[3][1])
+                gx.plot(val[2][0], val[2][1], "rx")
+                gx.plot(val[3][0], val[3][1], "bx")
+                ax.plot(projectile.getXFromT(val[2][0]), projectile.getYFromX(projectile.getXFromT(val[2][0])), "rx")
+                ax.plot(projectile.getXFromT(val[3][0]), projectile.getYFromX(projectile.getXFromT(val[3][0])), "bx")
+
+            gx.legend(loc="upper right")
+            ax.legend(loc="upper right")
             
-            canvas1.draw()
+            
+            canvas.draw()
+
+        def clear():
+            gx.clear()
+            ax.clear()
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("auto")
         
         gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
         launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
@@ -620,6 +637,7 @@ class Page7(tk.Frame):
         #tP_label, tP_entry = tk.Label(self, text = 'Sample Rate', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
 
         sub_btn=tk.Button(self, text = 'Submit', command = submit)
+        clear_btn=tk.Button(self, text = 'Clear', command = clear)
 
         gravity_label.pack(side=tk.TOP)
         gravity_entry.pack(side=tk.TOP)
@@ -632,9 +650,10 @@ class Page7(tk.Frame):
         #tP_entry.pack(side=tk.TOP)
 
         sub_btn.pack(side=tk.TOP)
+        clear_btn.pack(side=tk.TOP)
 
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
-        canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
 
 class timeProjectile():
@@ -693,15 +712,21 @@ class freqProjectile():
     def calcRange(self):
         #quadratic formula rearanged
         t = (self.uy + np.sqrt(self.uy**2 + 2*self.g*self.h))/self.g
-        xRange = self.ux * t
+        xRange = self.getXFromT(t)
         return t, xRange
+    
+    def getYFromX(self, x):
+        return self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h
+    
+    def getXFromT(self, t):
+        return t * self.ux
     
     def simulate(self):
         n = self.xRange/self.freq
         xGenerator = (n * i for i in range(self.freq+1))
         for x in xGenerator:
             self.xpos.append(x)
-            self.ypos.append(self.uy*x/self.ux - (self.g/2)*(x/self.ux)**2 + self.h)
+            self.ypos.append(self.getYFromX(x))
 
     def findDistance(self):
         z1 = self.uy - self.g * self.t
@@ -811,21 +836,26 @@ def rangePerTime(u, g, theta):
     theta = theta * np.pi/180
     discriminant = np.sin(theta)**2 - 8/9
     if discriminant >= 0:
-        tMax = 3*u * (np.sin(theta) + np.sqrt(discriminant))/(2*g)
+        tMax = 3*u * (np.sin(theta) - np.sqrt(discriminant))/(2*g)
         rMax = np.sqrt(u**2 * tMax**2 - g* tMax**3 * u * np.sin(theta) + 0.25*g**2 * tMax**4)
-        tMin = 3*u * (np.sin(theta) - np.sqrt(discriminant))/(2*g)
+        tMin = 3*u * (np.sin(theta) + np.sqrt(discriminant))/(2*g)
         rMin = np.sqrt(u**2 * tMin**2 - g* tMin**3 * u * np.sin(theta) + 0.25*g**2 * tMin**4)
         maximum = [tMax, rMax]
         minimum = [tMin, rMin]
+        end = minimum[0] + 0.5 * minimum[0]
+        if end < 4:
+            end = 4
     else:
         maximum = None
         minimum = None
-    end = 3
+        end = 4
+    
     t = np.linspace(0, end)
     r = []
     for i in t:
         r.append(np.sqrt(u**2 * i**2 - g* i**3 * u * np.sin(theta) + 0.25*g**2 * i**4))
     return t, r, maximum, minimum
+
 
 # Driver Code
 app = tkinterApp()
