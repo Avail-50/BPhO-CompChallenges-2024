@@ -610,7 +610,6 @@ class Page7(tk.Frame):
             gx.set_aspect("auto")
             gx.plot(val[0], val[1], "-", label= "θ = " + str(angle))
             ax.plot(projectile.xpos, projectile.ypos, "-", label= "θ = "+ str(angle))
-            print(val[2])
             if val[2] != None:
                 gx.plot(val[2][0], val[2][1], "rx")
                 gx.plot(val[3][0], val[3][1], "bx")
