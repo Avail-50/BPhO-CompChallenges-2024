@@ -626,9 +626,14 @@ class Page7(tk.Frame):
         def clear():
             gx.clear()
             ax.clear()
+            
+            gx.set_xlabel("t /s")
+            gx.set_ylabel("r /m")
+            gx.set_aspect("auto")
             ax.set_xlabel("x /m")
             ax.set_ylabel("y /m")
             ax.set_aspect("auto")
+            canvas.draw()
         
         gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
         launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
