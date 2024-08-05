@@ -67,7 +67,7 @@ plotx, ploty, t = bounce.verlet()
 line2 = ax.plot(plotx[0], ploty[0], "r-")[0]
 ball = ax.plot(plotx[0], ploty[0], "go")[0]
 
-ax.set(xlim=[0, 40], ylim=[0, 15], xlabel='Time [s]', ylabel='Z [m]')
+ax.set(xlim=[0, 40], ylim=[0, 15], xlabel='x /m', ylabel='y /m')
 #ax.legend()
 
 def update(frame):
@@ -79,7 +79,7 @@ def update(frame):
     ball.set_xdata([plotx[frame]])
     ball.set_ydata([ploty[frame]])
     
-    return (line2)
+    return (line2, ball)
 
 
 ani = animation.FuncAnimation(fig=fig, func=update, frames=len(plotx), interval = 10)

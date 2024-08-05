@@ -7,6 +7,7 @@ from tkinter import *
 #from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
+import matplotlib.animation as animation
 
 
 class tkinterApp(tk.Tk):
@@ -29,7 +30,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (StartPage, Page1, Page2, Page3, Page4, Page5, Page7):
+        for F in (StartPage, Page1, Page2, Page3, Page4, Page5, Page7, Page8):
   
             frame = F(container, self)
   
@@ -89,6 +90,9 @@ class StartPage(tk.Frame):
 
         button7 = tk.Button(self, text ="Challenge 7", command=lambda : controller.show_frame(Page7))
         button7.grid(row = 7, column = 1, padx = 10, pady = 10)
+
+        button8 = tk.Button(self, text ="Challenge 8", command=lambda : controller.show_frame(Page8))
+        button8.grid(row = 8, column = 1, padx = 10, pady = 10)
 
 
 
@@ -559,7 +563,9 @@ class Page5(tk.Frame):
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-#challenge 7
+#no window 6
+
+# seventh window frome page7
 class Page7(tk.Frame): 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -656,6 +662,141 @@ class Page7(tk.Frame):
         sub_btn.pack(side=tk.TOP)
         clear_btn.pack(side=tk.TOP)
 
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+# eighth window frame page8
+class Page8(tk.Frame): 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text ="Challenge 8")
+        label.pack(side=tk.TOP)
+  
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
+
+        fig = Figure(figsize=(6, 6), dpi= 100)
+        ax = fig.add_subplot()
+
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
+
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        launchAngle_var = tk.IntVar()
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        launchHieght_var = tk.IntVar()
+        maxBounceN_var = tk.IntVar()
+
+        frequency_var = tk.IntVar()
+
+        plotWidth_var = tk.IntVar()
+        plotHeight_var = tk.IntVar()
+
+        def submit():
+
+            angle = launchAngle_var.get()
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            height = launchHieght_var.get()
+            freq = frequency_var.get()
+            n = maxBounceN_var.get()
+            plotWidth = plotWidth_var.get()
+            plotHeight = plotHeight_var.get()
+
+            bounce = BouncingProjectile(angle, speed, height, n, freq=freq, g=grav)
+            plotx, ploty, t = bounce.verlet()
+            ax.clear()
+
+            t_label.config(text="Completion Time = "+ str(np.round(t, 2)) +"s ±" + str(np.round(1/freq, 3)) +"s")
+            #airTime_label.config(text="Max Air Time = "+ str(np.round(mrP.t, 3)))
+            #maxTheta_label.config(text="Max θ = "+ str(np.round(mrP.launchAngle * 180/np.pi, 1)))
+            #maxPathLength_label.config(text="Path Length = " + str(np.round(mrP.pathLength, 3)))
+
+            #ax.plot(fP.xpos, fP.ypos, "-o", label="θ = "+str(angle)+"°")
+            #ax.plot(mrP.xpos, mrP.ypos, "--", label="Max range")
+            
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("equal")
+            #ax.legend(loc="upper right")
+            if animate_var.get() == 0:
+                ax.plot(plotx, ploty, "r-")
+            else:
+                line2 = ax.plot(plotx[0], ploty[0], "r-")[0]
+                ball = ax.plot(plotx[0], ploty[0], "go")[0]
+
+                ax.set(xlim=[0, plotWidth], ylim=[0, plotHeight], xlabel='x /m', ylabel='y /m')
+
+                def update(frame):
+
+                    # update the line plot:
+                    line2.set_xdata(plotx[:frame])
+                    line2.set_ydata(ploty[:frame])
+
+                    ball.set_xdata([plotx[frame]])
+                    ball.set_ydata([ploty[frame]])
+                    
+                    return (line2, ball)
+
+
+                ani = animation.FuncAnimation(fig=fig, func=update, frames=len(plotx), interval = 10)
+            
+            canvas.draw()
+        
+        launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
+        n_label, n_entry = tk.Label(self, text = 'Max Bounces', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = maxBounceN_var, font=('calibre',10,'normal'))
+
+        tP_label, tP_entry = tk.Label(self, text = 'Frequency (affects quality and speed of animation)', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+
+        plotWidth_label, plotWidth_entry = tk.Label(self, text = 'Axis Width (only for animation)', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = plotWidth_var, font=('calibre',10,'normal'))
+        plotHeight_label, plotHeight_entry = tk.Label(self, text = 'Axis Height (only for animation)', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = plotHeight_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+
+        launchAngle_label.pack(side=tk.TOP)
+        launchAngle_entry.pack(side=tk.TOP)
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        launchHeight_label.pack(side=tk.TOP)
+        launchHeight_entry.pack(side=tk.TOP)
+        n_label.pack(side=tk.TOP)
+        n_entry.pack(side=tk.TOP)
+        plotWidth_label.pack(side=tk.TOP)
+        plotWidth_entry.pack(side=tk.TOP)
+        plotHeight_label.pack(side=tk.TOP)
+        plotHeight_entry.pack(side=tk.TOP)
+
+        tP_label.pack(side=tk.TOP)
+        tP_entry.pack(side=tk.TOP)
+
+        animate_var = tk.IntVar()
+        Checkbutton(self, text="animate", variable=animate_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+
+        t_label = tk.Label(self, text=("Completion Time ="), font=('calibre',10, 'bold'))
+        #airTime_label = tk.Label(self, text=("Max Air Time ="), font=('calibre',10, 'bold'))
+        #maxTheta_label = tk.Label(self, text=("Max θ = "), font=('calibre',10, 'bold'))
+        #maxPathLength_label = tk.Label(self, text=("Max Path Length = "), font=('calibre',10, 'bold'))
+        t_label.pack(side=tk.TOP)
+        #airTime_label.pack(side=tk.TOP)
+        #maxTheta_label.pack(side=tk.TOP)
+        #maxPathLength_label.pack(side=tk.TOP)
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
@@ -859,6 +1000,43 @@ def rangePerTime(u, g, theta):
     for i in t:
         r.append(np.sqrt(u**2 * i**2 - g* i**3 * u * np.sin(theta) + 0.25*g**2 * i**4))
     return t, r, maximum, minimum
+
+class BouncingProjectile():
+    def __init__(self, launchAngle, launchSpeed, launchHeight, n, g=9.81, freq=100):
+        self.theta = launchAngle * np.pi/180
+        self.ux, self.uy = self.resolve(launchSpeed)
+        self.y_0 = launchHeight
+        self.freq = freq
+        self.g = g
+        self.deltaT = 1/freq
+        self.C = 0.7
+        self.n = n
+
+    def resolve(self, u):
+        uy = np.round(np.sin(self.theta) * u, 2)
+        ux = np.round(np.cos(self.theta) * u, 2)
+        return(ux, uy)
+    
+    def verlet(self):
+        x_coords = [0]
+        y_coords = [self.y_0]
+        vy = self.uy
+        t = 0
+        bounceN = 0
+
+        while bounceN <= self.n:
+            x_coords.append(x_coords[-1] + self.ux*self.deltaT)
+            y_coords.append(y_coords[-1] + vy*self.deltaT - 0.5*self.g*self.deltaT**2)
+            vy -= self.g*self.deltaT
+            t += self.deltaT
+
+            if y_coords[-1] < 0:
+                y_coords[-1] = 0
+                vy *= -self.C
+                bounceN += 1
+        
+        return x_coords, y_coords, t
+
 
 
 # Driver Code
