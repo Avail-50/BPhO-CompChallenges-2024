@@ -76,8 +76,8 @@ def update(frame):
     line2.set_xdata(plotx[:frame])
     line2.set_ydata(ploty[:frame])
 
-    ball.set_xdata(plotx[frame])
-    ball.set_ydata(ploty[frame])
+    ball.set_xdata([plotx[frame]])
+    ball.set_ydata([ploty[frame]])
     
     return (line2)
 
