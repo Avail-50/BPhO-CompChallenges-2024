@@ -19,3 +19,5 @@ qol improvements:
 - ability to have saved values
 - input validation
 - challenge 3, say if speed is to low to reach goal
+- blitting for animations
+- auto axes sizing for animation
