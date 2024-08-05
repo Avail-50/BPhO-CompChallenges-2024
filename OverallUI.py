@@ -29,7 +29,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (StartPage, Page1, Page2, Page3, Page4, Page5):
+        for F in (StartPage, Page1, Page2, Page3, Page4, Page5, Page7):
   
             frame = F(container, self)
   
@@ -86,6 +86,9 @@ class StartPage(tk.Frame):
 
         label6 = tk.Label(self, text ="Challenge 6 (integrated with others)")
         label6.grid(row = 6, column = 1, padx = 10, pady = 10)
+
+        button7 = tk.Button(self, text ="Challenge 7", command=lambda : controller.show_frame(Page7))
+        button7.grid(row = 7, column = 1, padx = 10, pady = 10)
 
 
 
@@ -555,6 +558,85 @@ class Page5(tk.Frame):
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+#challenge 7
+class Page7(tk.Frame): 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text ="Challenge 7")
+        label.pack(side=tk.TOP)
+  
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
+
+        fig1 = Figure(figsize=(6, 6), dpi= 100)
+
+        gx = fig1.add_subplot()
+        gx.set_xlabel("t /s")
+        gx.set_ylabel("r /m")
+        gx.set_aspect("equal")
+
+        #fig2 = Figure(figsize=(6, 6), dpi= 100)
+        #ax = fig2.add_subplot()
+        #ax.set_xlabel("x /m")
+        #ax.set_ylabel("y /m")
+        #ax.set_aspect("equal")
+
+        canvas1 = FigureCanvasTkAgg(fig1, master=self)
+        canvas1.draw()
+        canvas2 = FigureCanvasTkAgg(fig2, master=self)
+        canvas2.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas1, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        launchAngle_var = tk.IntVar()
+
+        frequency_var = tk.IntVar()
+
+        def submit():
+
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            angle = launchAngle_var.get()
+            
+            val = rangePerTime(speed, grav, angle)
+
+            
+            gx.set_aspect("equal")
+            gx.plot(val[0], val[1])
+            if val[2] != None:
+                gx.plot(val[2][0], val[2][1])
+                gx.plot(val[3][0], val[3][1])
+            
+            canvas1.draw()
+        
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
+
+        #tP_label, tP_entry = tk.Label(self, text = 'Sample Rate', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        launchAngle_label.pack(side=tk.TOP)
+        launchAngle_entry.pack(side=tk.TOP)
+
+        #tP_label.pack(side=tk.TOP)
+        #tP_entry.pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+
 class timeProjectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
         self.launchAngle = launchAngle * np.pi/180
@@ -724,6 +806,26 @@ class boundingParabola():
         xpos = np.linspace(0, xMax, self.freq)
         ypos = list(np.round(((self.u**2)/(2*self.g) - self.g*x**2/(2*self.u**2) + self.h), 3) for x in xpos)
         return xpos, ypos
+
+def rangePerTime(u, g, theta):
+    theta = theta * np.pi/180
+    discriminant = np.sin(theta)**2 - 8/9
+    if discriminant >= 0:
+        tMax = 3*u * (np.sin(theta) + np.sqrt(discriminant))/(2*g)
+        rMax = np.sqrt(u**2 * tMax**2 - g* tMax**3 * u * np.sin(theta) + 0.25*g**2 * tMax**4)
+        tMin = 3*u * (np.sin(theta) - np.sqrt(discriminant))/(2*g)
+        rMin = np.sqrt(u**2 * tMin**2 - g* tMin**3 * u * np.sin(theta) + 0.25*g**2 * tMin**4)
+        maximum = [tMax, rMax]
+        minimum = [tMin, rMin]
+    else:
+        maximum = None
+        minimum = None
+    end = 3
+    t = np.linspace(0, end)
+    r = []
+    for i in t:
+        r.append(np.sqrt(u**2 * i**2 - g* i**3 * u * np.sin(theta) + 0.25*g**2 * i**4))
+    return t, r, maximum, minimum
 
 # Driver Code
 app = tkinterApp()
