@@ -30,7 +30,7 @@ class tkinterApp(tk.Tk):
   
         # iterating through a tuple consisting
         # of the different page layouts
-        for F in (StartPage, Page1, Page2, Page3, Page4, Page5, Page7, Page8):
+        for F in (StartPage, Page1, Page2, Page3, Page4, Page5, Page7, Page8, Page9):
   
             frame = F(container, self)
   
@@ -93,6 +93,9 @@ class StartPage(tk.Frame):
 
         button8 = tk.Button(self, text ="Challenge 8", command=lambda : controller.show_frame(Page8))
         button8.grid(row = 8, column = 1, padx = 10, pady = 10)
+
+        button9 = tk.Button(self, text ="Challenge 9", command=lambda : controller.show_frame(Page9))
+        button9.grid(row = 9, column = 1, padx = 10, pady = 10)
 
 
 
@@ -813,6 +816,111 @@ class Page8(tk.Frame):
         toolbar.pack(side=tk.BOTTOM, fill=tk.X)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+#ninth window frame page 9
+class Page9(tk.Frame): 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text ="Challenge 9")
+        label.pack(side=tk.TOP)
+  
+        button1 = tk.Button(self, text ="Startpage", command=lambda : controller.show_frame(StartPage))
+        button1.pack(side=tk.BOTTOM)
+
+        fig = Figure(figsize=(6, 6), dpi= 100)
+        ax = fig.add_subplot()
+
+        ax.set_xlabel("x /m")
+        ax.set_ylabel("y /m")
+        ax.set_aspect("equal")
+
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+
+        toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
+        toolbar.update()
+
+
+        launchAngle_var = tk.IntVar()
+        gravity_var = tk.IntVar()
+        launchSpeed_var = tk.IntVar()
+        launchHieght_var = tk.IntVar()
+
+        frequency_var = tk.IntVar()
+
+        def submit():
+
+            angle = launchAngle_var.get()
+            grav = gravity_var.get()
+            speed = launchSpeed_var.get()
+            height = launchHieght_var.get()
+            freq = frequency_var.get()
+
+            ax.clear()
+
+            dP = apogeeProjectile(angle, grav, speed, height, freq)
+            dP.simulate()
+            rP = DragProjectile(angle, grav, speed, height, freq)
+            rP.verlet()
+
+            range_label.config(text="Range = "+ str(np.round(dP.xRange, 3)))
+            airTime_label.config(text="Air Time = "+ str(np.round(dP.t, 3)))
+            apogee_label.config(text="Apogee = ["+ str(np.round(dP.apogee[0], 3)) + ", " +str(np.round(dP.apogee[1], 3))+"]")
+            pathLength_label.config(text="Path Length = " + str(np.round(dP.pathLength, 3)))
+
+            ax.plot(dP.xpos, dP.ypos, "--", label="No Drag")
+            #ax.plot(dP.apogee[0], dP.apogee[1], "ro", label="apogee")
+            ax.plot(rP.x_coords, rP.y_coords, "-", label="Drag")
+            #ax.plot(rP.apogee[0], rP.apogee[1], "ro")
+            ax.set_xlabel("x /m")
+            ax.set_ylabel("y /m")
+            ax.set_aspect("equal")
+            ax.legend(loc="upper right")
+            if boundParab_var.get() == 1:
+                p = boundingParabola(grav, speed, height, freq) 
+                ax.plot(p.xpos, p.ypos)
+            
+            
+            canvas.draw()
+        
+        launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
+        gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
+        launchSpeed_label, launchSpeed_entry = tk.Label(self, text = 'Launch Speed', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchSpeed_var, font=('calibre',10,'normal'))
+        launchHeight_label, launchHeight_entry = tk.Label(self, text = 'Launch Height', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchHieght_var, font=('calibre',10,'normal'))
+
+        tP_label, tP_entry = tk.Label(self, text = 'Sample Rate', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = frequency_var, font=('calibre',10,'normal'))
+
+        sub_btn=tk.Button(self, text = 'Submit', command = submit)
+
+
+        launchAngle_label.pack(side=tk.TOP)
+        launchAngle_entry.pack(side=tk.TOP)
+        gravity_label.pack(side=tk.TOP)
+        gravity_entry.pack(side=tk.TOP)
+        launchSpeed_label.pack(side=tk.TOP)
+        launchSpeed_entry.pack(side=tk.TOP)
+        launchHeight_label.pack(side=tk.TOP)
+        launchHeight_entry.pack(side=tk.TOP)
+
+        tP_label.pack(side=tk.TOP)
+        tP_entry.pack(side=tk.TOP)
+
+        boundParab_var = tk.IntVar()
+        Checkbutton(self, text="bounding parabola", variable=boundParab_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
+
+        sub_btn.pack(side=tk.TOP)
+
+
+        range_label = tk.Label(self, text=("Range ="), font=('calibre',10, 'bold'))
+        airTime_label = tk.Label(self, text=("Air Time ="), font=('calibre',10, 'bold'))
+        apogee_label = tk.Label(self, text=("Apogee ="), font=('calibre',10, 'bold'))
+        pathLength_label = tk.Label(self, text=("Path Length ="), font=('calibre',10, 'bold'))
+        range_label.pack(side=tk.TOP)
+        airTime_label.pack(side=tk.TOP)
+        apogee_label.pack(side=tk.TOP)
+        pathLength_label.pack(side=tk.TOP)
+        toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
 
 class timeProjectile():
     def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, timePeriod) -> None:
@@ -932,7 +1040,6 @@ class trajectoryProjectile():
             self.xpos.append(x)
             self.ypos.append(uy*x/ux - (self.g/2)*(x/ux)**2)
 
-
 class highLowProjectile():
     def __init__(self, xDest, yDest, gravity, launchSpeed, freq):
         self.xDest, self.yDest = xDest, yDest
@@ -1050,7 +1157,38 @@ class BouncingProjectile():
         
         return x_coords, y_coords, t
 
+class DragProjectile(apogeeProjectile):
+    def __init__(self, launchAngle, gravity, launchSpeed, launchHeight, freq, dragCoefficient=0.1, area=0.07854, aDensity=1, mass=0.1):      
+        super().__init__(launchAngle, gravity, launchSpeed, launchHeight, freq)
+        self.deltaT = 1/freq
+        self.k = (0.5*dragCoefficient*aDensity*area)/mass
+        self.u = launchSpeed
+        self.x_coords, self.y_coords = [], []
 
+
+    def verlet(self):
+        self.x_coords = [0]
+        self.y_coords = [self.h]
+        vx = self.ux
+        vy = self.uy
+        v = self.u   
+        ax = -(vx/v)*self.k*v**2
+        ay = -self.g -(vy/v)*self.k*v**2
+
+        while self.y_coords[-1] >= 0:
+
+            self.x_coords.append(self.x_coords[-1] + vx*self.deltaT + 0.5*ax*self.deltaT**2)
+            self.y_coords.append(self.y_coords[-1] + vy*self.deltaT + 0.5*ay*self.deltaT**2)
+
+            vx += ax*self.deltaT
+            vy += ay*self.deltaT
+            v = np.sqrt(vx**2 + vy**2)
+
+            ax = -(vx/v)*self.k*v**2
+            ay = -self.g -(vy/v)*self.k*v**2
+            
+
+        return self.x_coords, self.y_coords
 
 # Driver Code
 app = tkinterApp()
