@@ -688,6 +688,8 @@ class Page8(tk.Frame):
         toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=False)
         toolbar.update()
 
+        animating = False
+
 
         launchAngle_var = tk.IntVar()
         gravity_var = tk.IntVar()
@@ -748,8 +750,17 @@ class Page8(tk.Frame):
 
 
                 ani = animation.FuncAnimation(fig=fig, func=update, frames=len(plotx), interval = 10)
-            
+                
             canvas.draw()
+
+        '''
+        def save():                
+                #ani.save(filename=".../assets/animation_example.mp4", writer="ffmpeg")
+                print("saving")
+        '''
+        
+
+        
         
         launchAngle_label, launchAngle_entry = tk.Label(self, text = 'Launch Angle', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = launchAngle_var, font=('calibre',10,'normal'))
         gravity_label, gravity_entry = tk.Label(self, text = 'Gravity', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = gravity_var, font=('calibre',10,'normal'))
@@ -763,6 +774,7 @@ class Page8(tk.Frame):
         plotHeight_label, plotHeight_entry = tk.Label(self, text = 'Axis Height (only for animation)', font=('calibre',10, 'bold')), tk.Entry(self,textvariable = plotHeight_var, font=('calibre',10,'normal'))
 
         sub_btn=tk.Button(self, text = 'Submit', command = submit)
+        #save_btn=tk.Button(self, text = 'Save (only for animations)', command = save())
 
 
         launchAngle_label.pack(side=tk.TOP)
@@ -787,6 +799,7 @@ class Page8(tk.Frame):
         Checkbutton(self, text="animate", variable=animate_var, onvalue=1, offvalue=0).pack(side=tk.TOP)
 
         sub_btn.pack(side=tk.TOP)
+        #save_btn.pack(side=tk.TOP)
 
 
         t_label = tk.Label(self, text=("Completion Time ="), font=('calibre',10, 'bold'))
