@@ -89,7 +89,7 @@ normal.simulate()
 dragProj = DragProjectile(30, 9.81, 20, 2, 100)
 xPoints, yPoints = dragProj.verlet()
 
-print(dragProj.apogee)
+#print(dragProj.apogee)
     
 plt.plot(xPoints, yPoints, "-", label="y vs x")
 plt.plot(normal.xpos, normal.ypos)
