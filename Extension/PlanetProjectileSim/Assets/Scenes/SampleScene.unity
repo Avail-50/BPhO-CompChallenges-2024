@@ -967,10 +967,9 @@ MonoBehaviour:
   go: {fileID: 1472993374}
   start: {fileID: 1905492565}
   end: {fileID: 1228541061}
+  nowGo: 0
   going: 0
-  spin: 0
-  r: 0
-  newProjectile: {fileID: 1475231742374389630, guid: c3bf8bcfdf3ace04ea33fecb87f67ad6, type: 3}
+  newProjectile: {fileID: 3299675012803422641, guid: c3bf8bcfdf3ace04ea33fecb87f67ad6, type: 3}
 --- !u!1 &1039749317
 GameObject:
   m_ObjectHideFlags: 0

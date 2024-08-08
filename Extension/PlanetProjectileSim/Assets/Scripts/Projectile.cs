@@ -9,11 +9,8 @@ public class Projectile : MonoBehaviour
     public Transform start;
     public Transform end;
 
-    public bool going = false;
-
-    public float spin = 16.7f/3600;
-    private long earthScaleGM = 3953309000000;
-    [SerializeField] private float r;
+    [SerializeField] private bool nowGo = false;
+    [SerializeField] private bool going = false;
 
     public GameObject newProjectile;
 
@@ -26,22 +23,19 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (going == true)
+        if (nowGo == true)
         {
+            going = true;
             // creates new projectile object
             GameObject Missile = Instantiate(newProjectile, start.position, transform.rotation);
-            LiftOff();
+            nowGo = false;
         }
     }
 
     void NoParameterOnClick()
     {
-        going = true;
+        if (!going)
+            nowGo = true;
     }
 
-    void LiftOff()
-    {
-        Debug.Log("lift off");
-        going = false;
-    }
 }
