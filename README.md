@@ -10,7 +10,6 @@
 - [x] Challenge 8
 - [x] Challenge 9
 - [ ] Extensions
-- [ ] Big Challenge
 - [ ] Final video?
 
 
