@@ -1,5 +1,7 @@
 # BPhO-CompChallenges-2024
+These are my solutions to the 2024 British Physics Olympiad Computational Challenge.
 
+## Roadmap
 - [x] Challenge 1 (tested)
 - [x] Challenge 2 (tested)
 - [x] Challenge 3 (tested)
@@ -10,10 +12,9 @@
 - [x] Challenge 8
 - [x] Challenge 9
 - [ ] Extensions
-- [ ] Final video?
 
 
-qol improvements:
+## Potential qol improvements:
 - select between degrees and radians
 - ability to have saved values
 - input validation
